@@ -1,0 +1,2582 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+
+<title>SDN Intelligent Load Balancer</title>
+
+<style>
+
+*{
+box-sizing:border-box;
+}
+
+:root{
+--bg:#08111d;
+--panel:#0d1928;
+--panel2:#101f31;
+--border:#1d3045;
+--text:#e8eef5;
+--muted:#8498ac;
+--green:#55d6a5;
+--blue:#5da9ff;
+--yellow:#ffcc66;
+--red:#ff7b8a;
+--purple:#b98cff;
+}
+
+body{
+margin:0;
+font-family:Arial,Helvetica,sans-serif;
+background:var(--bg);
+color:var(--text);
+}
+
+.container{
+width:94%;
+max-width:1800px;
+margin:auto;
+}
+
+header{
+background:#091522;
+border-bottom:1px solid var(--border);
+padding:20px 0;
+}
+
+.header-row{
+display:flex;
+justify-content:space-between;
+align-items:center;
+gap:20px;
+}
+
+h1{
+margin:0;
+font-size:27px;
+font-weight:600;
+letter-spacing:.2px;
+}
+
+.subtitle{
+color:var(--muted);
+font-size:13px;
+margin-top:7px;
+}
+
+.status-area{
+display:flex;
+gap:8px;
+flex-wrap:wrap;
+justify-content:flex-end;
+}
+
+.badge{
+padding:7px 11px;
+border-radius:6px;
+background:#101f30;
+border:1px solid #263c52;
+font-size:11px;
+color:#b6c6d5;
+}
+
+.badge.online{
+color:var(--green);
+}
+
+.badge.live{
+border-color:#2b765c;
+}
+
+main{
+padding-bottom:20px;
+}
+
+.grid{
+display:grid;
+gap:14px;
+}
+
+.kpis{
+grid-template-columns:repeat(5,1fr);
+margin:18px 0;
+}
+
+.card{
+background:var(--panel);
+border:1px solid var(--border);
+border-radius:10px;
+padding:16px;
+}
+
+.kpi-label{
+color:var(--muted);
+font-size:11px;
+text-transform:uppercase;
+letter-spacing:.5px;
+}
+
+.kpi-value{
+font-size:25px;
+font-weight:600;
+margin-top:7px;
+}
+
+.section{
+margin:24px 0;
+}
+
+.section-title{
+font-size:18px;
+font-weight:600;
+margin-bottom:11px;
+}
+
+.section-subtitle{
+font-size:12px;
+color:var(--muted);
+margin-top:-5px;
+margin-bottom:12px;
+}
+
+
+/* =========================
+   DECISION
+========================= */
+
+.decision{
+display:grid;
+grid-template-columns:1.15fr 2fr;
+gap:14px;
+}
+
+.selected{
+background:#0d211f;
+border-color:#286b56;
+position:relative;
+}
+
+.selected-tag{
+position:absolute;
+right:15px;
+top:15px;
+font-size:10px;
+font-weight:bold;
+letter-spacing:.6px;
+color:var(--green);
+border:1px solid #286b56;
+padding:5px 8px;
+border-radius:5px;
+}
+
+.selected-server{
+font-size:38px;
+font-weight:600;
+margin:13px 0 4px;
+}
+
+.selected-address{
+color:#91a6b8;
+font-size:12px;
+}
+
+.score{
+font-size:18px;
+color:var(--green);
+margin-top:14px;
+}
+
+.decision-meta{
+display:flex;
+gap:10px;
+flex-wrap:wrap;
+margin-top:15px;
+}
+
+.meta-box{
+background:#091722;
+border:1px solid #1b3540;
+padding:9px 11px;
+border-radius:6px;
+}
+
+.meta-label{
+font-size:10px;
+color:var(--muted);
+}
+
+.meta-value{
+font-size:13px;
+font-weight:bold;
+margin-top:3px;
+}
+
+.weights{
+display:grid;
+grid-template-columns:repeat(4,1fr);
+gap:9px;
+margin-top:15px;
+}
+
+.weight{
+background:#091522;
+border:1px solid #172b3e;
+padding:11px;
+border-radius:7px;
+text-align:center;
+}
+
+.weight b{
+display:block;
+font-size:19px;
+margin-top:4px;
+}
+
+.lower-note{
+color:#71869a;
+font-size:11px;
+line-height:1.5;
+}
+
+
+/* =========================
+   BACKENDS
+========================= */
+
+.servers{
+grid-template-columns:repeat(3,1fr);
+}
+
+.server-card{
+position:relative;
+transition:border-color .2s ease;
+}
+
+.server-card.selected-card{
+border-color:#2c9a75;
+background:#0d211f;
+}
+
+.selected-label{
+position:absolute;
+right:14px;
+top:14px;
+font-size:9px;
+font-weight:bold;
+letter-spacing:.7px;
+color:var(--green);
+border:1px solid #2c765d;
+padding:4px 7px;
+border-radius:4px;
+}
+
+.server-name{
+font-size:18px;
+font-weight:600;
+}
+
+.server-ip{
+color:#8198ad;
+font-size:11px;
+margin-top:4px;
+}
+
+.health{
+margin:13px 0;
+height:5px;
+background:#182b3d;
+border-radius:10px;
+overflow:hidden;
+}
+
+.health-bar{
+height:100%;
+background:var(--green);
+border-radius:10px;
+}
+
+.metrics{
+display:grid;
+grid-template-columns:repeat(2,1fr);
+gap:7px;
+}
+
+.metric{
+background:#091522;
+border:1px solid #16293b;
+border-radius:6px;
+padding:9px;
+}
+
+.metric-label{
+color:#72889d;
+font-size:10px;
+}
+
+.metric-value{
+font-size:15px;
+font-weight:600;
+margin-top:4px;
+}
+
+.server-score{
+margin-top:11px;
+padding-top:10px;
+border-top:1px solid #1a3042;
+font-size:11px;
+color:#8198ad;
+}
+
+.server-score b{
+color:#a9bac9;
+}
+
+.selection-count{
+margin-top:4px;
+}
+
+
+/* =========================
+   CHARTS
+========================= */
+
+.charts{
+grid-template-columns:repeat(2,1fr);
+}
+
+.chart-card{
+min-height:365px;
+}
+
+.chart-title{
+font-size:16px;
+font-weight:600;
+}
+
+.chart-description{
+color:#71869a;
+font-size:11px;
+margin:5px 0 10px;
+}
+
+canvas{
+width:100%;
+height:275px;
+display:block;
+}
+
+
+/* =========================
+   COMPARISON
+========================= */
+
+.comparison{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:14px;
+}
+
+.bar-row{
+margin:13px 0;
+}
+
+.bar-header{
+display:flex;
+justify-content:space-between;
+font-size:12px;
+margin-bottom:5px;
+}
+
+.bar-background{
+height:9px;
+background:#172a3c;
+border-radius:8px;
+overflow:hidden;
+}
+
+.bar-fill{
+height:100%;
+background:var(--blue);
+border-radius:8px;
+}
+
+.score-best{
+background:var(--green);
+}
+
+
+/* =========================
+   EVENTS
+========================= */
+
+.events{
+max-height:310px;
+overflow-y:auto;
+}
+
+.event{
+display:grid;
+grid-template-columns:90px 145px 1fr 80px;
+padding:10px 4px;
+border-bottom:1px solid #182b3d;
+gap:10px;
+align-items:center;
+font-size:12px;
+}
+
+.event:last-child{
+border-bottom:none;
+}
+
+.event-server{
+font-weight:bold;
+}
+
+.event-score{
+color:var(--green);
+font-weight:bold;
+}
+
+.event-time{
+color:#71869a;
+font-size:11px;
+}
+
+
+/* =========================
+   RESULTS
+========================= */
+
+.results{
+grid-template-columns:1fr 1fr;
+}
+
+.result-grid{
+display:grid;
+grid-template-columns:repeat(4,1fr);
+gap:9px;
+margin-top:15px;
+}
+
+.result-box{
+background:#091522;
+border:1px solid #172b3d;
+border-radius:7px;
+padding:10px;
+}
+
+.result-number{
+font-size:21px;
+font-weight:600;
+margin-top:4px;
+}
+
+
+/* =========================
+   FRESHNESS
+========================= */
+
+.freshness{
+display:flex;
+align-items:center;
+gap:7px;
+font-size:11px;
+color:var(--muted);
+}
+
+.fresh-dot{
+width:7px;
+height:7px;
+border-radius:50%;
+background:#71869a;
+}
+
+.fresh-dot.live{
+background:var(--green);
+}
+
+.fresh-dot.stale{
+background:var(--yellow);
+}
+
+.fresh-dot.offline{
+background:var(--red);
+}
+
+
+/* =========================
+   SCROLLBAR
+========================= */
+
+::-webkit-scrollbar{
+width:7px;
+}
+
+::-webkit-scrollbar-track{
+background:#091522;
+}
+
+::-webkit-scrollbar-thumb{
+background:#263b50;
+border-radius:5px;
+}
+
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media(max-width:1200px){
+
+.kpis{
+grid-template-columns:repeat(3,1fr);
+}
+
+.servers,
+.charts,
+.comparison{
+grid-template-columns:1fr;
+}
+
+.decision{
+grid-template-columns:1fr;
+}
+
+}
+
+@media(max-width:800px){
+
+.container{
+width:92%;
+}
+
+.header-row{
+flex-direction:column;
+align-items:flex-start;
+}
+
+.status-area{
+justify-content:flex-start;
+}
+
+.kpis,
+.results{
+grid-template-columns:1fr;
+}
+
+.weights,
+.result-grid{
+grid-template-columns:repeat(2,1fr);
+}
+
+.event{
+grid-template-columns:1fr;
+gap:4px;
+}
+
+}
+
+
+/* =========================
+   SMALL ANIMATION
+========================= */
+
+.value-change{
+animation:valueFlash .45s ease;
+}
+
+@keyframes valueFlash{
+
+0%{
+opacity:.45;
+}
+
+100%{
+opacity:1;
+}
+
+}
+
+</style>
+</head>
+
+
+<body>
+
+
+<header>
+
+<div class="container header-row">
+
+<div>
+
+<h1>SDN Intelligent Load Balancer</h1>
+
+<div class="subtitle">
+Real-time intelligent traffic steering using Ryu + OpenFlow + Mininet + OVS
+</div>
+
+</div>
+
+
+<div class="status-area">
+
+<div class="badge online">
+● Dashboard Online
+</div>
+
+<div class="badge live" id="monitorStatus">
+Monitoring: --
+</div>
+
+<div class="badge">
+OpenFlow 1.3
+</div>
+
+<div class="badge">
+OVS
+</div>
+
+<div class="badge">
+Ryu
+</div>
+
+</div>
+
+</div>
+
+</header>
+
+
+<main class="container">
+
+
+<!-- =========================
+     KPI
+========================= -->
+
+<section class="grid kpis">
+
+
+<div class="card">
+
+<div class="kpi-label">
+Backend Servers
+</div>
+
+<div class="kpi-value" id="backendCount">
+--
+</div>
+
+</div>
+
+
+<div class="card">
+
+<div class="kpi-label">
+Ryu Selections
+</div>
+
+<div class="kpi-value" id="selectionCount">
+--
+</div>
+
+</div>
+
+
+<div class="card">
+
+<div class="kpi-label">
+Experiment Success Rate
+</div>
+
+<div class="kpi-value" id="successRate">
+--
+</div>
+
+</div>
+
+
+<div class="card">
+
+<div class="kpi-label">
+Average Response
+</div>
+
+<div class="kpi-value" id="avgResponse">
+--
+</div>
+
+</div>
+
+
+<div class="card">
+
+<div class="kpi-label">
+Active Connections
+</div>
+
+<div class="kpi-value" id="activeConnections">
+--
+</div>
+
+</div>
+
+
+</section>
+
+
+<!-- =========================
+     DECISION
+========================= -->
+
+<section class="section">
+
+<div class="section-title">
+Current Intelligent Decision
+</div>
+
+<div class="decision">
+
+
+<div class="card selected">
+
+<div class="selected-tag">
+RYU SELECTED
+</div>
+
+<div class="kpi-label">
+Latest Backend Selected by Ryu
+</div>
+
+<div class="selected-server" id="selectedBackend">
+Waiting...
+</div>
+
+<div class="selected-address" id="selectedAddress">
+Waiting for selection data
+</div>
+
+<div class="score">
+Score:
+<span id="selectedScore">--</span>
+</div>
+
+
+<div class="decision-meta">
+
+<div class="meta-box">
+
+<div class="meta-label">
+SELECTION STATUS
+</div>
+
+<div class="meta-value" id="selectionStatus">
+Waiting
+</div>
+
+</div>
+
+
+<div class="meta-box">
+
+<div class="meta-label">
+LAST UPDATED
+</div>
+
+<div class="meta-value" id="lastUpdated">
+--
+</div>
+
+</div>
+
+
+<div class="meta-box">
+
+<div class="meta-label">
+DATA AGE
+</div>
+
+<div class="meta-value" id="dataAge">
+--
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+<div class="card">
+
+<div class="kpi-label">
+Intelligent Selection Model
+</div>
+
+<h2>
+Weighted Multi-Metric Decision
+</h2>
+
+<div class="weights">
+
+<div class="weight">
+CPU
+<b>40%</b>
+</div>
+
+<div class="weight">
+Connections
+<b>20%</b>
+</div>
+
+<div class="weight">
+Response
+<b>25%</b>
+</div>
+
+<div class="weight">
+Network
+<b>15%</b>
+</div>
+
+</div>
+
+<div class="lower-note" style="margin-top:13px">
+The controller evaluates normalized real-time backend measurements and selects the backend with the lowest weighted score.
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- =========================
+     LIVE STATUS
+========================= -->
+
+<section class="section">
+
+<div class="section-title">
+Live Monitoring Status
+</div>
+
+<div class="card">
+
+<div class="freshness">
+
+<div class="fresh-dot" id="freshDot"></div>
+
+<span id="freshnessText">
+Waiting for monitoring data...
+</span>
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- =========================
+     BACKENDS
+========================= -->
+
+<section class="section">
+
+<div class="section-title">
+Live Backend Health
+</div>
+
+<div class="section-subtitle">
+Real-time measurements from h5 to h10. The highlighted backend is the latest backend selected by Ryu.
+</div>
+
+<div class="grid servers" id="servers"></div>
+
+</section>
+
+
+<!-- =========================
+     CHARTS
+========================= -->
+
+<section class="section">
+
+<div class="section-title">
+Live Monitoring Graphs
+</div>
+
+<div class="section-subtitle">
+All backend servers are plotted simultaneously using the latest monitoring samples.
+</div>
+
+<div class="grid charts">
+
+
+<div class="card chart-card">
+
+<div class="chart-title">
+CPU Utilization (%)
+</div>
+
+<div class="chart-description">
+Lower CPU utilization generally indicates more available processing capacity.
+</div>
+
+<canvas id="cpuChart"></canvas>
+
+</div>
+
+
+<div class="card chart-card">
+
+<div class="chart-title">
+Response Time (ms)
+</div>
+
+<div class="chart-description">
+Lower response time indicates faster backend HTTP responses.
+</div>
+
+<canvas id="responseChart"></canvas>
+
+</div>
+
+
+<div class="card chart-card">
+
+<div class="chart-title">
+Active Connections
+</div>
+
+<div class="chart-description">
+Number of active TCP connections observed on each backend.
+</div>
+
+<canvas id="connectionChart"></canvas>
+
+</div>
+
+
+<div class="card chart-card">
+
+<div class="chart-title">
+Network Traffic
+</div>
+
+<div class="chart-description">
+Network bytes observed for each backend during monitoring.
+</div>
+
+<canvas id="networkChart"></canvas>
+
+</div>
+
+
+</div>
+
+</section>
+
+
+<!-- =========================
+     COMPARISON
+========================= -->
+
+<section class="section">
+
+<div class="section-title">
+Current Backend Comparison
+</div>
+
+<div class="comparison">
+
+
+<div class="card">
+
+<h3>
+Intelligent Score
+</h3>
+
+<div class="lower-note">
+Lower score = better current condition according to the weighted algorithm.
+</div>
+
+<div id="scoreBars">
+Waiting for score data...
+</div>
+
+</div>
+
+
+<div class="card">
+
+<h3>
+Ryu Selection Distribution
+</h3>
+
+<div class="lower-note">
+Number of times each backend has actually been selected by Ryu.
+</div>
+
+<div id="selectionBars">
+Waiting for selection data...
+</div>
+
+</div>
+
+
+</div>
+
+</section>
+
+
+<!-- =========================
+     EVENTS
+========================= -->
+
+<section class="section">
+
+<div class="section-title">
+Recent Ryu Intelligent Selection Events
+</div>
+
+<div class="card events" id="events">
+Waiting for Ryu events...
+</div>
+
+</section>
+
+
+<!-- =========================
+     RESULTS
+========================= -->
+
+<section class="section">
+
+<div class="section-title">
+Completed Experiment Results
+</div>
+
+<div class="grid results">
+
+
+<div class="card">
+
+<div class="kpi-label">
+Intelligent Load Balancing
+</div>
+
+<h2>
+60-Request Experiment
+</h2>
+
+<div class="result-grid">
+
+
+<div class="result-box">
+
+<div class="kpi-label">
+Total
+</div>
+
+<div class="result-number" id="intTotal">
+--
+</div>
+
+</div>
+
+
+<div class="result-box">
+
+<div class="kpi-label">
+Success
+</div>
+
+<div class="result-number" id="intSuccess">
+--
+</div>
+
+</div>
+
+
+<div class="result-box">
+
+<div class="kpi-label">
+Failed
+</div>
+
+<div class="result-number" id="intFailed">
+--
+</div>
+
+</div>
+
+
+<div class="result-box">
+
+<div class="kpi-label">
+Avg Response
+</div>
+
+<div class="result-number" id="intAvg">
+--
+</div>
+
+</div>
+
+
+</div>
+
+</div>
+
+
+<div class="card">
+
+<div class="kpi-label">
+Multi-Client Experiment
+</div>
+
+<h2>
+Concurrent Client Test
+</h2>
+
+<div class="result-grid">
+
+
+<div class="result-box">
+
+<div class="kpi-label">
+Total
+</div>
+
+<div class="result-number" id="multiTotal">
+--
+</div>
+
+</div>
+
+
+<div class="result-box">
+
+<div class="kpi-label">
+Success
+</div>
+
+<div class="result-number" id="multiSuccess">
+--
+</div>
+
+</div>
+
+
+<div class="result-box">
+
+<div class="kpi-label">
+Failed
+</div>
+
+<div class="result-number" id="multiFailed">
+--
+</div>
+
+</div>
+
+
+<div class="result-box">
+
+<div class="kpi-label">
+Success Rate
+</div>
+
+<div class="result-number" id="multiRate">
+--
+</div>
+
+</div>
+
+
+</div>
+
+</div>
+
+
+</div>
+
+</section>
+
+
+</main>
+
+
+<footer>
+SDN Intelligent Load Balancer • Ryu • OpenFlow 1.3 • Mininet • Open vSwitch
+</footer>
+
+
+<script>
+
+/* =========================================================
+   LIVE DASHBOARD STATE
+========================================================= */
+
+const historyData={
+cpu:{},
+response:{},
+connections:{},
+network:{}
+};
+
+const MAX_POINTS=40;
+
+let lastLiveUpdate=null;
+let lastSelectedBackend=null;
+
+
+/* =========================================================
+   SERVER COLORS
+========================================================= */
+
+const colors=[
+"#55d6a5",
+"#5da9ff",
+"#ffcc66",
+"#ff7b8a",
+"#b98cff",
+"#54d5df"
+];
+
+
+/* =========================================================
+   HISTORY
+========================================================= */
+
+function updateHistory(servers){
+
+servers.forEach(s=>{
+
+if(!historyData.cpu[s.server]){
+
+historyData.cpu[s.server]=[];
+historyData.response[s.server]=[];
+historyData.connections[s.server]=[];
+historyData.network[s.server]=[];
+
+}
+
+historyData.cpu[s.server].push(
+Number(s.cpu_percent)||0
+);
+
+const responseValue=Number(s.response_time_ms);
+
+if(Number.isFinite(responseValue) && responseValue>=0){
+
+historyData.response[s.server].push(responseValue);
+
+}
+
+historyData.connections[s.server].push(
+Number(s.active_connections)||0
+);
+
+historyData.network[s.server].push(
+Number(s.network_bytes)||0
+);
+
+
+historyData.cpu[s.server]=
+historyData.cpu[s.server].slice(-MAX_POINTS);
+
+historyData.response[s.server]=
+historyData.response[s.server].slice(-MAX_POINTS);
+
+historyData.connections[s.server]=
+historyData.connections[s.server].slice(-MAX_POINTS);
+
+historyData.network[s.server]=
+historyData.network[s.server].slice(-MAX_POINTS);
+
+});
+
+}
+
+
+/* =========================================================
+   CHART
+========================================================= */
+
+function drawChart(canvasId,data,unit){
+
+const canvas=document.getElementById(canvasId);
+
+if(!canvas)return;
+
+const ctx=canvas.getContext("2d");
+
+const width=canvas.clientWidth;
+
+const height=canvas.clientHeight;
+
+if(width<50 || height<50)return;
+
+canvas.width=width*devicePixelRatio;
+
+canvas.height=height*devicePixelRatio;
+
+ctx.setTransform(
+devicePixelRatio,
+0,
+0,
+devicePixelRatio,
+0,
+0
+);
+
+ctx.clearRect(0,0,width,height);
+
+
+const left=48;
+const right=15;
+const top=15;
+const bottom=38;
+
+const chartWidth=width-left-right;
+const chartHeight=height-top-bottom;
+
+
+let values=[];
+
+Object.values(data).forEach(arr=>{
+
+values=values.concat(
+arr.filter(v=>Number.isFinite(v))
+);
+
+});
+
+
+if(!values.length){
+
+ctx.fillStyle="#71869a";
+
+ctx.font="13px Arial";
+
+ctx.fillText(
+"Waiting for monitoring data...",
+20,
+40
+);
+
+return;
+
+}
+
+
+let min=Math.min(...values);
+
+let max=Math.max(...values);
+
+
+if(min===max){
+
+min-=1;
+max+=1;
+
+}
+
+
+/* GRID */
+
+ctx.strokeStyle="#1d3144";
+
+ctx.lineWidth=1;
+
+for(let i=0;i<=4;i++){
+
+const y=
+top+(chartHeight*i/4);
+
+ctx.beginPath();
+
+ctx.moveTo(left,y);
+
+ctx.lineTo(width-right,y);
+
+ctx.stroke();
+
+
+const value=
+max-(max-min)*i/4;
+
+ctx.fillStyle="#71869a";
+
+ctx.font="10px Arial";
+
+ctx.fillText(
+value.toFixed(1)+unit,
+3,
+y+3
+);
+
+}
+
+
+/* DATA LINES */
+
+Object.entries(data).forEach(
+([server,arr],index)=>{
+
+if(!arr.length)return;
+
+const valid=
+arr.filter(v=>Number.isFinite(v));
+
+if(!valid.length)return;
+
+ctx.beginPath();
+
+arr.forEach((value,i)=>{
+
+if(!Number.isFinite(value))return;
+
+const x=
+left+
+(i/Math.max(MAX_POINTS-1,1))
+*chartWidth;
+
+const y=
+top+
+chartHeight-
+((value-min)/(max-min))
+*chartHeight;
+
+
+if(!ctx._lineStarted){
+
+ctx.moveTo(x,y);
+
+ctx._lineStarted=true;
+
+}
+else{
+
+ctx.lineTo(x,y);
+
+}
+
+});
+
+
+ctx.strokeStyle=
+colors[index%colors.length];
+
+ctx.lineWidth=2;
+
+ctx.stroke();
+
+ctx._lineStarted=false;
+
+});
+
+
+/* LEGEND */
+
+let legendX=left;
+
+Object.keys(data).forEach(
+(server,index)=>{
+
+ctx.fillStyle=
+colors[index%colors.length];
+
+ctx.fillRect(
+legendX,
+height-20,
+10,
+10
+);
+
+ctx.fillStyle="#b8c7d5";
+
+ctx.font="11px Arial";
+
+ctx.fillText(
+server,
+legendX+14,
+height-11
+);
+
+legendX+=55;
+
+});
+
+}
+
+
+/* =========================================================
+   CHARTS
+========================================================= */
+
+function renderCharts(){
+
+drawChart(
+"cpuChart",
+historyData.cpu,
+"%"
+);
+
+drawChart(
+"responseChart",
+historyData.response,
+" ms"
+);
+
+drawChart(
+"connectionChart",
+historyData.connections,
+""
+);
+
+drawChart(
+"networkChart",
+historyData.network,
+""
+);
+
+}
+
+
+/* =========================================================
+   BACKEND CARDS
+========================================================= */
+
+function renderServers(
+servers,
+counts,
+selectedBackend
+){
+
+const container=
+document.getElementById("servers");
+
+container.innerHTML="";
+
+
+servers.forEach(s=>{
+
+const cpu=
+Number(s.cpu_percent)||0;
+
+const connections=
+Number(s.active_connections)||0;
+
+const response=
+Number(s.response_time_ms);
+
+const network=
+Number(s.network_bytes)||0;
+
+const bar=
+Math.min(Math.max(cpu,0),100);
+
+
+const isSelected=
+selectedBackend &&
+(
+s.server===selectedBackend ||
+`${s.server} ${s.ip}:${s.port}`.includes(
+selectedBackend
+)
+);
+
+
+const card=
+document.createElement("div");
+
+card.className=
+"card server-card"+
+(isSelected?" selected-card":"");
+
+
+const responseText=
+Number.isFinite(response) &&
+response>=0
+?response.toFixed(2)+" ms"
+:"N/A";
+
+
+card.innerHTML=`
+
+${isSelected
+?`<div class="selected-label">RYU SELECTED</div>`
+:""}
+
+<div class="server-name">
+${s.server}
+</div>
+
+<div class="server-ip">
+${s.ip}:${s.port}
+</div>
+
+<div class="health">
+<div class="health-bar"
+style="width:${bar}%">
+</div>
+</div>
+
+<div class="metrics">
+
+<div class="metric">
+<div class="metric-label">CPU</div>
+<div class="metric-value">
+${cpu.toFixed(1)}%
+</div>
+</div>
+
+<div class="metric">
+<div class="metric-label">Connections</div>
+<div class="metric-value">
+${connections}
+</div>
+</div>
+
+<div class="metric">
+<div class="metric-label">Response</div>
+<div class="metric-value">
+${responseText}
+</div>
+</div>
+
+<div class="metric">
+<div class="metric-label">Network</div>
+<div class="metric-value">
+${network.toLocaleString()}
+</div>
+</div>
+
+</div>
+
+<div class="server-score">
+
+Intelligent Score:
+<b>
+${
+s.score!==null &&
+s.score!==undefined &&
+Number.isFinite(Number(s.score))
+?Number(s.score).toFixed(4)
+:"--"
+}
+</b>
+
+<div class="selection-count">
+
+Ryu Selections:
+<b>
+${counts[s.server]||0}
+</b>
+
+</div>
+
+</div>
+
+`;
+
+
+container.appendChild(card);
+
+});
+
+}
+
+
+/* =========================================================
+   SCORE BARS
+========================================================= */
+
+function renderScoreBars(
+servers,
+selectedBackend
+){
+
+const container=
+document.getElementById("scoreBars");
+
+container.innerHTML="";
+
+
+const valid=servers
+.filter(
+s=>
+s.score!==null &&
+s.score!==undefined &&
+Number.isFinite(Number(s.score))
+)
+.sort(
+(a,b)=>
+Number(a.score)-Number(b.score)
+);
+
+
+if(!valid.length){
+
+container.innerHTML=
+"Waiting for score data...";
+
+return;
+
+}
+
+
+const max=
+Math.max(
+...valid.map(s=>Number(s.score)),
+0.01
+);
+
+
+valid.forEach((s,index)=>{
+
+const score=
+Number(s.score);
+
+const isSelected=
+selectedBackend &&
+(
+s.server===selectedBackend ||
+`${s.server} ${s.ip}:${s.port}`.includes(
+selectedBackend
+)
+);
+
+
+const row=
+document.createElement("div");
+
+row.className="bar-row";
+
+
+row.innerHTML=`
+
+<div class="bar-header">
+
+<span>
+${s.server}
+${isSelected?" • RYU SELECTED":""}
+</span>
+
+<b>
+${score.toFixed(4)}
+</b>
+
+</div>
+
+<div class="bar-background">
+
+<div class="bar-fill ${
+index===0?"score-best":""
+}"
+style="
+width:${Math.max(
+5,
+(score/max)*100
+)}%">
+</div>
+
+</div>
+
+`;
+
+container.appendChild(row);
+
+});
+
+}
+
+
+/* =========================================================
+   SELECTION BARS
+========================================================= */
+
+function renderSelectionBars(
+servers,
+counts,
+selectedBackend
+){
+
+const container=
+document.getElementById("selectionBars");
+
+container.innerHTML="";
+
+
+const max=Math.max(
+...servers.map(
+s=>counts[s.server]||0
+),
+1
+);
+
+
+servers.forEach(s=>{
+
+const count=
+counts[s.server]||0;
+
+const isSelected=
+selectedBackend &&
+(
+s.server===selectedBackend ||
+`${s.server} ${s.ip}:${s.port}`.includes(
+selectedBackend
+)
+);
+
+
+const row=
+document.createElement("div");
+
+row.className="bar-row";
+
+
+row.innerHTML=`
+
+<div class="bar-header">
+
+<span>
+${s.server}
+${isSelected?" • CURRENT":""}
+</span>
+
+<b>
+${count}
+</b>
+
+</div>
+
+<div class="bar-background">
+
+<div class="bar-fill ${
+isSelected?"score-best":""
+}"
+style="
+width:${
+Math.max(
+count===0?0:5,
+(count/max)*100
+)
+}%">
+</div>
+
+</div>
+
+`;
+
+container.appendChild(row);
+
+});
+
+}
+
+
+/* =========================================================
+   EVENTS
+========================================================= */
+
+function renderEvents(events){
+
+const container=
+document.getElementById("events");
+
+
+if(!events || !events.length){
+
+container.innerHTML=
+"No Ryu intelligent selection events yet.";
+
+return;
+
+}
+
+
+container.innerHTML=
+events.map(e=>{
+
+const score=
+Number(e.score);
+
+return `
+
+<div class="event">
+
+<div class="event-server">
+${e.server}
+</div>
+
+<div>
+${e.ip}:${e.port}
+</div>
+
+<div class="event-time">
+Intelligent backend selected
+</div>
+
+<div class="event-score">
+${
+Number.isFinite(score)
+?score.toFixed(4)
+:"--"
+}
+</div>
+
+</div>
+
+`;
+
+}).join("");
+
+}
+
+
+/* =========================================================
+   SELECTED BACKEND
+========================================================= */
+
+function updateSelectedBackend(data){
+
+const selected=
+data.selected_backend;
+
+
+const selectedEl=
+document.getElementById(
+"selectedBackend"
+);
+
+const addressEl=
+document.getElementById(
+"selectedAddress"
+);
+
+const scoreEl=
+document.getElementById(
+"selectedScore"
+);
+
+
+if(!selected){
+
+selectedEl.textContent="Waiting...";
+
+addressEl.textContent=
+"Waiting for selection data";
+
+scoreEl.textContent="--";
+
+document.getElementById(
+"selectionStatus"
+).textContent="Waiting";
+
+return;
+
+}
+
+
+selectedEl.textContent=
+selected;
+
+
+let matched=null;
+
+if(Array.isArray(data.servers)){
+
+matched=
+data.servers.find(
+s=>
+s.server===selected ||
+selected.includes(s.server) ||
+selected.includes(s.ip)
+);
+
+}
+
+
+if(matched){
+
+addressEl.textContent=
+`${matched.ip}:${matched.port}`;
+
+}
+
+
+const score=
+Number(data.selected_score);
+
+
+scoreEl.textContent=
+Number.isFinite(score)
+?score.toFixed(4)
+:"--";
+
+
+document.getElementById(
+"selectionStatus"
+).textContent=
+"Active";
+
+if(lastSelectedBackend!==selected){
+
+selectedEl.classList.remove(
+"value-change"
+);
+
+void selectedEl.offsetWidth;
+
+selectedEl.classList.add(
+"value-change"
+);
+
+lastSelectedBackend=selected;
+
+}
+
+}
+
+
+/* =========================================================
+   LIVE DATA
+========================================================= */
+
+async function updateLive(){
+
+try{
+
+const response=
+await fetch(
+"/api/live",
+{
+cache:"no-store"
+}
+);
+
+
+if(!response.ok){
+
+throw new Error(
+"Live API HTTP "+response.status
+);
+
+}
+
+
+const data=
+await response.json();
+
+
+lastLiveUpdate=
+Date.now();
+
+
+document.getElementById(
+"backendCount"
+).textContent=
+Array.isArray(data.servers)
+?data.servers.length
+:"--";
+
+
+document.getElementById(
+"selectionCount"
+).textContent=
+data.total_selections??"--";
+
+
+updateSelectedBackend(data);
+
+
+const connections=
+Array.isArray(data.servers)
+?data.servers.reduce(
+(sum,s)=>
+sum+
+(Number(s.active_connections)||0),
+0
+)
+:0;
+
+
+document.getElementById(
+"activeConnections"
+).textContent=
+connections;
+
+
+updateHistory(
+Array.isArray(data.servers)
+?data.servers
+:[]
+);
+
+
+renderServers(
+Array.isArray(data.servers)
+?data.servers
+:[],
+data.selection_counts||{},
+data.selected_backend
+);
+
+
+renderScoreBars(
+Array.isArray(data.servers)
+?data.servers
+:[],
+data.selected_backend
+);
+
+
+renderSelectionBars(
+Array.isArray(data.servers)
+?data.servers
+:[],
+data.selection_counts||{},
+data.selected_backend
+);
+
+
+renderEvents(
+data.recent_selections||[]
+);
+
+
+renderCharts();
+
+
+updateFreshness();
+
+}
+catch(error){
+
+console.error(
+"Live API:",
+error
+);
+
+updateOfflineState();
+
+}
+
+}
+
+
+/* =========================================================
+   STATUS
+========================================================= */
+
+async function updateStatus(){
+
+try{
+
+const response=
+await fetch(
+"/api/status",
+{
+cache:"no-store"
+}
+);
+
+
+if(!response.ok){
+
+throw new Error(
+"Status API HTTP "+response.status
+);
+
+}
+
+
+const data=
+await response.json();
+
+
+document.getElementById(
+"monitorStatus"
+).textContent=
+`Monitoring: ${data.backends_online}/${data.expected_backends}`;
+
+
+updateFreshness();
+
+}
+catch(error){
+
+document.getElementById(
+"monitorStatus"
+).textContent=
+"Monitoring: Offline";
+
+updateOfflineState();
+
+}
+
+}
+
+
+/* =========================================================
+   RESULTS
+========================================================= */
+
+async function updateResults(){
+
+try{
+
+const response=
+await fetch(
+"/api/results",
+{
+cache:"no-store"
+}
+);
+
+
+if(!response.ok){
+
+throw new Error(
+"Results API HTTP "+response.status
+);
+
+}
+
+
+const data=
+await response.json();
+
+
+const i=data.intelligent;
+
+const m=data.multi_client;
+
+
+if(i){
+
+document.getElementById(
+"successRate"
+).textContent=
+Number(i.success_rate).toFixed(1)+"%";
+
+
+document.getElementById(
+"avgResponse"
+).textContent=
+Number(i.average_response_ms).toFixed(2)+" ms";
+
+
+document.getElementById(
+"intTotal"
+).textContent=
+i.total;
+
+
+document.getElementById(
+"intSuccess"
+).textContent=
+i.successful;
+
+
+document.getElementById(
+"intFailed"
+).textContent=
+i.failed;
+
+
+document.getElementById(
+"intAvg"
+).textContent=
+Number(i.average_response_ms).toFixed(2)+" ms";
+
+}
+
+
+if(m){
+
+document.getElementById(
+"multiTotal"
+).textContent=
+m.total;
+
+
+document.getElementById(
+"multiSuccess"
+).textContent=
+m.successful;
+
+
+document.getElementById(
+"multiFailed"
+).textContent=
+m.failed;
+
+
+document.getElementById(
+"multiRate"
+).textContent=
+Number(m.success_rate).toFixed(1)+"%";
+
+}
+
+}
+catch(error){
+
+console.error(
+"Results API:",
+error
+);
+
+}
+
+}
+
+
+/* =========================================================
+   HISTORY
+========================================================= */
+
+function updateHistory(servers){
+
+servers.forEach(s=>{
+
+const server=
+s.server;
+
+
+if(!historyData.cpu[server]){
+
+historyData.cpu[server]=[];
+historyData.response[server]=[];
+historyData.connections[server]=[];
+historyData.network[server]=[];
+
+}
+
+
+historyData.cpu[server].push(
+Number(s.cpu_percent)
+);
+
+
+const response=
+Number(s.response_time_ms);
+
+
+if(
+Number.isFinite(response) &&
+response>=0
+){
+
+historyData.response[server].push(
+response
+);
+
+}
+
+
+historyData.connections[server].push(
+Number(s.active_connections)
+);
+
+
+historyData.network[server].push(
+Number(s.network_bytes)
+);
+
+
+historyData.cpu[server]=
+historyData.cpu[server].slice(
+-MAX_POINTS
+);
+
+historyData.response[server]=
+historyData.response[server].slice(
+-MAX_POINTS
+);
+
+historyData.connections[server]=
+historyData.connections[server].slice(
+-MAX_POINTS
+);
+
+historyData.network[server]=
+historyData.network[server].slice(
+-MAX_POINTS
+);
+
+});
+
+}
+
+
+/* =========================================================
+   FRESHNESS
+========================================================= */
+
+function updateFreshness(){
+
+const dot=
+document.getElementById(
+"freshDot"
+);
+
+const text=
+document.getElementById(
+"freshnessText"
+);
+
+
+if(!lastLiveUpdate){
+
+dot.className="fresh-dot";
+
+text.textContent=
+"Waiting for monitoring data...";
+
+return;
+
+}
+
+
+const age=
+Math.floor(
+(Date.now()-lastLiveUpdate)/1000
+);
+
+
+document.getElementById(
+"lastUpdated"
+).textContent=
+new Date(
+lastLiveUpdate
+).toLocaleTimeString();
+
+
+document.getElementById(
+"dataAge"
+).textContent=
+age<=1
+?"Just now"
+:`${age}s ago`;
+
+
+if(age<=5){
+
+dot.className=
+"fresh-dot live";
+
+text.textContent=
+`Live monitoring data • updated ${age}s ago`;
+
+}
+else if(age<=12){
+
+dot.className=
+"fresh-dot stale";
+
+text.textContent=
+`Data is slightly delayed • updated ${age}s ago`;
+
+}
+else{
+
+dot.className=
+"fresh-dot offline";
+
+text.textContent=
+`Monitoring data is stale • last update ${age}s ago`;
+
+}
+
+}
+
+
+/* =========================================================
+   OFFLINE
+========================================================= */
+
+function updateOfflineState(){
+
+const dot=
+document.getElementById(
+"freshDot"
+);
+
+const text=
+document.getElementById(
+"freshnessText"
+);
+
+
+dot.className=
+"fresh-dot offline";
+
+text.textContent=
+"Live monitoring API unavailable";
+
+
+document.getElementById(
+"selectionStatus"
+).textContent=
+"Unavailable";
+
+}
+
+
+/* =========================================================
+   START
+========================================================= */
+
+updateLive();
+
+updateStatus();
+
+updateResults();
+
+
+setInterval(
+updateLive,
+2000
+);
+
+
+setInterval(
+updateStatus,
+5000
+);
+
+
+setInterval(
+updateResults,
+5000
+);
+
+
+setInterval(
+updateFreshness,
+1000
+);
+
+
+window.addEventListener(
+"resize",
+renderCharts
+);
+
+</script>
+
+</body>
+</html>
+```

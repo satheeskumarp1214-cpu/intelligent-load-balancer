@@ -1,0 +1,32 @@
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+venv/
+.venv/
+env/
+ryu39/
+
+# Runtime logs
+*.log
+
+# Dashboard backup/development copies
+*.backup*
+*.before_*
+*.before*
+
+# Project backup directory
+backups/
+
+# OS/editor files
+.DS_Store
+*.swp
+*.swo
+.vscode/
+.idea/
+
+# Temporary files
+*.tmp
+*.temp

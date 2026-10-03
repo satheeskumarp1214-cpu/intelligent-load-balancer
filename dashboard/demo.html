@@ -1,0 +1,3537 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0">
+
+<title>
+SDN Intelligent Load Balancer - Demo Dashboard
+</title>
+
+
+<style>
+
+/* =========================================================
+   GLOBAL
+========================================================= */
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+
+    margin: 0;
+
+    font-family:
+        Inter,
+        Segoe UI,
+        Arial,
+        sans-serif;
+
+    background: #f4f6f9;
+
+    color: #172033;
+}
+
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+header {
+
+    background: #ffffff;
+
+    border-bottom:
+        1px solid #e3e7ed;
+
+    padding:
+        17px 28px;
+
+    display: flex;
+
+    justify-content:
+        space-between;
+
+    align-items:
+        center;
+}
+
+.logo-title {
+
+    font-size: 20px;
+
+    font-weight: 700;
+}
+
+.logo-subtitle {
+
+    margin-top: 4px;
+
+    color: #7d8796;
+
+    font-size: 12px;
+}
+
+.header-right {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+}
+
+.demo-badge {
+
+    background: #fff8df;
+
+    border:
+        1px solid #e4c45c;
+
+    color: #876700;
+
+    padding:
+        7px 10px;
+
+    border-radius: 6px;
+
+    font-size: 10px;
+
+    font-weight: 700;
+}
+
+.control-button {
+
+    border:
+        1px solid #d9dee7;
+
+    background: white;
+
+    color: #39445a;
+
+    padding:
+        7px 11px;
+
+    border-radius: 6px;
+
+    cursor: pointer;
+
+    font-size: 11px;
+}
+
+.control-button:hover {
+
+    background: #f4f6f9;
+}
+
+
+/* =========================================================
+   MAIN
+========================================================= */
+
+main {
+
+    max-width: 1450px;
+
+    margin: auto;
+
+    padding:
+        24px 28px;
+}
+
+
+/* =========================================================
+   STATUS BAR
+========================================================= */
+
+.status-bar {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 9px;
+
+    margin-bottom: 20px;
+
+    color: #697487;
+
+    font-size: 12px;
+}
+
+.status-dot {
+
+    width: 9px;
+
+    height: 9px;
+
+    border-radius: 50%;
+
+    background: #20a464;
+
+    box-shadow:
+        0 0 0 4px #20a46418;
+}
+
+.status-text {
+
+    font-weight: 600;
+
+    color: #354055;
+}
+
+.status-right {
+
+    margin-left: auto;
+
+    display: flex;
+
+    gap: 14px;
+}
+
+
+/* =========================================================
+   CARDS
+========================================================= */
+
+.card {
+
+    background: #ffffff;
+
+    border:
+        1px solid #e1e6ed;
+
+    border-radius: 10px;
+
+    padding: 17px;
+
+    box-shadow:
+        0 2px 8px rgba(
+            20,
+            30,
+            50,
+            0.035
+        );
+}
+
+
+/* =========================================================
+   SUMMARY
+========================================================= */
+
+.summary-grid {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(4, 1fr);
+
+    gap: 14px;
+}
+
+.summary-label {
+
+    color: #7d8796;
+
+    font-size: 10px;
+
+    text-transform:
+        uppercase;
+
+    letter-spacing:
+        .06em;
+}
+
+.summary-value {
+
+    font-size: 27px;
+
+    font-weight: 700;
+
+    margin-top: 8px;
+}
+
+.summary-sub {
+
+    color: #8b94a2;
+
+    font-size: 11px;
+
+    margin-top: 5px;
+}
+
+
+/* =========================================================
+   SECTION TITLES
+========================================================= */
+
+.section-title {
+
+    margin:
+        25px 0 12px;
+
+    font-size: 15px;
+
+    font-weight: 700;
+}
+
+
+/* =========================================================
+   BACKEND CARDS
+========================================================= */
+
+.backend-grid {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, 1fr);
+
+    gap: 14px;
+}
+
+.backend-card {
+
+    position: relative;
+
+    transition:
+        border .3s ease,
+        transform .3s ease;
+}
+
+.backend-card.selected {
+
+    border:
+        2px solid #246bfe;
+
+    transform:
+        translateY(-2px);
+}
+
+.selected-tag {
+
+    position: absolute;
+
+    right: 12px;
+
+    top: 12px;
+
+    background: #edf3ff;
+
+    color: #246bfe;
+
+    padding:
+        5px 8px;
+
+    border-radius: 5px;
+
+    font-size: 9px;
+
+    font-weight: 700;
+}
+
+.server-name {
+
+    font-size: 15px;
+
+    font-weight: 700;
+}
+
+.server-ip {
+
+    color: #8993a3;
+
+    font-size: 11px;
+
+    margin-top: 3px;
+}
+
+
+/* =========================================================
+   HEALTH BADGE
+========================================================= */
+
+.health-badge {
+
+    display: inline-block;
+
+    margin-top: 9px;
+
+    padding:
+        4px 7px;
+
+    border-radius: 5px;
+
+    font-size: 9px;
+
+    font-weight: 700;
+}
+
+.health-good {
+
+    background: #eaf8f0;
+
+    color: #208a55;
+}
+
+.health-medium {
+
+    background: #fff6df;
+
+    color: #9a7200;
+}
+
+.health-high {
+
+    background: #fff0ed;
+
+    color: #bd513e;
+}
+
+
+/* =========================================================
+   METRICS
+========================================================= */
+
+.metric {
+
+    margin-top: 14px;
+}
+
+.metric-line {
+
+    display: flex;
+
+    justify-content:
+        space-between;
+
+    align-items:
+        center;
+
+    font-size: 11px;
+
+    color: #687386;
+
+    margin-bottom: 6px;
+}
+
+.metric-value {
+
+    color: #263249;
+
+    font-weight: 700;
+}
+
+.progress {
+
+    width: 100%;
+
+    height: 6px;
+
+    background: #edf0f4;
+
+    border-radius: 5px;
+
+    overflow: hidden;
+}
+
+.progress-fill {
+
+    height: 100%;
+
+    background: #246bfe;
+
+    border-radius: 5px;
+
+    transition:
+        width .8s ease;
+}
+
+
+/* =========================================================
+   CHART GRID
+========================================================= */
+
+.chart-grid {
+
+    display: grid;
+
+    grid-template-columns:
+        1fr 1fr;
+
+    gap: 14px;
+
+    margin-top: 20px;
+}
+
+.chart-title {
+
+    font-size: 13px;
+
+    font-weight: 700;
+
+    margin-bottom: 8px;
+}
+
+.chart-description {
+
+    color: #8a94a4;
+
+    font-size: 10px;
+
+    margin-bottom: 8px;
+}
+
+canvas {
+
+    width: 100%;
+
+    height: 220px;
+
+    display: block;
+}
+
+
+/* =========================================================
+   LOWER GRID
+========================================================= */
+
+.lower-grid {
+
+    display: grid;
+
+    grid-template-columns:
+        1fr 1fr 1fr;
+
+    gap: 14px;
+
+    margin-top: 20px;
+}
+
+
+/* =========================================================
+   GAUGE
+========================================================= */
+
+.gauge-container {
+
+    display: flex;
+
+    justify-content:
+        center;
+
+    align-items:
+        center;
+
+    height: 220px;
+
+    position: relative;
+}
+
+.gauge {
+
+    width: 180px;
+
+    height: 180px;
+
+    border-radius: 50%;
+
+    background:
+        conic-gradient(
+            #246bfe 0deg,
+            #246bfe var(--gauge-angle),
+            #edf0f4 var(--gauge-angle),
+            #edf0f4 360deg
+        );
+
+    display: flex;
+
+    justify-content:
+        center;
+
+    align-items:
+        center;
+}
+
+.gauge-inner {
+
+    width: 135px;
+
+    height: 135px;
+
+    background: white;
+
+    border-radius: 50%;
+
+    display: flex;
+
+    flex-direction:
+        column;
+
+    justify-content:
+        center;
+
+    align-items:
+        center;
+}
+
+.gauge-value {
+
+    font-size: 30px;
+
+    font-weight: 700;
+}
+
+.gauge-label {
+
+    color: #8993a3;
+
+    font-size: 10px;
+
+    margin-top: 3px;
+}
+
+
+/* =========================================================
+   EVENTS
+========================================================= */
+
+.events {
+
+    margin-top: 20px;
+}
+
+.event {
+
+    display: flex;
+
+    justify-content:
+        space-between;
+
+    gap: 12px;
+
+    padding:
+        10px 0;
+
+    border-bottom:
+        1px solid #edf0f4;
+
+    font-size: 11px;
+}
+
+.event:last-child {
+
+    border-bottom: none;
+}
+
+.event-main {
+
+    color: #344056;
+}
+
+.event-time {
+
+    color: #8b94a2;
+
+    white-space:
+        nowrap;
+}
+
+
+/* =========================================================
+   LIVE INDICATOR
+========================================================= */
+
+.live-indicator {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 6px;
+
+    color: #208a55;
+
+    font-size: 10px;
+
+    font-weight: 700;
+}
+
+.live-dot {
+
+    width: 6px;
+
+    height: 6px;
+
+    border-radius: 50%;
+
+    background: #20a464;
+
+    animation:
+        pulse 1.3s infinite;
+}
+
+@keyframes pulse {
+
+    0% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: .3;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+
+/* =========================================================
+   FOOTER
+========================================================= */
+
+.footer {
+
+    text-align: center;
+
+    color: #9ba4b1;
+
+    font-size: 10px;
+
+    margin:
+        25px 0 5px;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media(max-width: 1100px) {
+
+    .summary-grid {
+
+        grid-template-columns:
+            repeat(2, 1fr);
+    }
+
+    .backend-grid {
+
+        grid-template-columns:
+            repeat(2, 1fr);
+    }
+
+    .lower-grid {
+
+        grid-template-columns:
+            1fr 1fr;
+    }
+}
+
+@media(max-width: 700px) {
+
+    header {
+
+        padding:
+            15px;
+    }
+
+    main {
+
+        padding:
+            18px;
+    }
+
+    .summary-grid,
+    .backend-grid,
+    .chart-grid,
+    .lower-grid {
+
+        grid-template-columns:
+            1fr;
+    }
+
+    .status-right {
+
+        display: none;
+    }
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<!-- =======================================================
+     HEADER
+======================================================= -->
+
+<header>
+
+    <div>
+
+        <div class="logo-title">
+            SDN Intelligent Load Balancer
+        </div>
+
+        <div class="logo-subtitle">
+            Dynamic behavior simulation dashboard
+        </div>
+
+    </div>
+
+
+    <div class="header-right">
+
+        <button
+            class="control-button"
+            id="pauseButton"
+            onclick="toggleSimulation()">
+
+            Pause
+
+        </button>
+
+
+        <button
+            class="control-button"
+            onclick="resetSimulation()">
+
+            Reset
+
+        </button>
+
+
+        <div class="demo-badge">
+
+            VISUAL DEMO MODE
+
+        </div>
+
+    </div>
+
+</header>
+
+
+
+<main>
+
+
+<!-- =======================================================
+     STATUS
+======================================================= -->
+
+<div class="status-bar">
+
+    <span class="status-dot"></span>
+
+    <span class="status-text">
+        Simulation Online
+    </span>
+
+    <span>•</span>
+
+    <span>
+        VIP: 10.0.0.100:8000
+    </span>
+
+
+    <div class="status-right">
+
+        <span class="live-indicator">
+
+            <span class="live-dot"></span>
+
+            LIVE SIMULATION
+
+        </span>
+
+
+        <span>
+            Updated:
+            <b id="clock">--</b>
+        </span>
+
+    </div>
+
+</div>
+
+
+
+<!-- =======================================================
+     SUMMARY CARDS
+======================================================= -->
+
+<div class="summary-grid">
+
+
+    <div class="card">
+
+        <div class="summary-label">
+            Requests / Sec
+        </div>
+
+        <div
+            class="summary-value"
+            id="rps">
+
+            --
+
+        </div>
+
+        <div class="summary-sub">
+            Simulated incoming traffic
+        </div>
+
+    </div>
+
+
+
+    <div class="card">
+
+        <div class="summary-label">
+            Selected Backend
+        </div>
+
+        <div
+            class="summary-value"
+            id="selectedBackend">
+
+            --
+
+        </div>
+
+        <div
+            class="summary-sub"
+            id="selectedAddress">
+
+            --
+
+        </div>
+
+    </div>
+
+
+
+    <div class="card">
+
+        <div class="summary-label">
+            Intelligent Score
+        </div>
+
+        <div
+            class="summary-value"
+            id="selectedScore">
+
+            --
+
+        </div>
+
+        <div class="summary-sub">
+            Lower score = preferred
+        </div>
+
+    </div>
+
+
+
+    <div class="card">
+
+        <div class="summary-label">
+            Requests Processed
+        </div>
+
+        <div
+            class="summary-value"
+            id="processed">
+
+            --
+
+        </div>
+
+        <div class="summary-sub">
+            Continuous simulation
+        </div>
+
+    </div>
+
+
+    <div class="card">
+
+        <div class="summary-label">
+            Average Response
+        </div>
+
+        <div
+            class="summary-value"
+            id="avgResponse">
+
+            --
+
+        </div>
+
+        <div class="summary-sub">
+            Across all backends
+        </div>
+
+    </div>
+
+
+
+    <div class="card">
+
+        <div class="summary-label">
+            Throughput
+        </div>
+
+        <div
+            class="summary-value"
+            id="throughput">
+
+            --
+
+        </div>
+
+        <div class="summary-sub">
+            Simulated MB/s
+        </div>
+
+    </div>
+
+
+
+    <div class="card">
+
+        <div class="summary-label">
+            Success Rate
+        </div>
+
+        <div
+            class="summary-value"
+            id="successRate">
+
+            --
+
+        </div>
+
+        <div class="summary-sub">
+            Current traffic window
+        </div>
+
+    </div>
+
+
+
+    <div class="card">
+
+        <div class="summary-label">
+            System Load
+        </div>
+
+        <div
+            class="summary-value"
+            id="systemLoad">
+
+            --
+
+        </div>
+
+        <div class="summary-sub">
+            Overall simulated load
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<!-- =======================================================
+     BACKENDS
+======================================================= -->
+
+<div class="section-title">
+
+    Backend Live Metrics
+
+</div>
+
+
+<div
+    class="backend-grid"
+    id="backendContainer">
+
+</div>
+
+
+
+<!-- =======================================================
+     CHARTS
+======================================================= -->
+
+<div class="chart-grid">
+
+
+    <div class="card">
+
+        <div class="chart-title">
+
+            CPU Utilization — Line
+
+        </div>
+
+        <div class="chart-description">
+
+            Average CPU movement over time
+
+        </div>
+
+        <canvas id="cpuLineChart"></canvas>
+
+    </div>
+
+
+
+    <div class="card">
+
+        <div class="chart-title">
+
+            Network Traffic — Area
+
+        </div>
+
+        <div class="chart-description">
+
+            Simulated network throughput
+
+        </div>
+
+        <canvas id="networkAreaChart"></canvas>
+
+    </div>
+
+
+
+    <div class="card">
+
+        <div class="chart-title">
+
+            Backend CPU — Bar
+
+        </div>
+
+        <div class="chart-description">
+
+            Current CPU comparison
+
+        </div>
+
+        <canvas id="cpuBarChart"></canvas>
+
+    </div>
+
+
+
+    <div class="card">
+
+        <div class="chart-title">
+
+            Request Distribution — Doughnut
+
+        </div>
+
+        <div class="chart-description">
+
+            Simulated request share
+
+        </div>
+
+        <canvas id="distributionChart"></canvas>
+
+    </div>
+
+</div>
+
+
+
+<!-- =======================================================
+     LOWER VISUALS
+======================================================= -->
+
+<div class="lower-grid">
+
+
+    <div class="card">
+
+        <div class="chart-title">
+
+            Backend Health — Radar
+
+        </div>
+
+        <div class="chart-description">
+
+            Relative backend condition
+
+        </div>
+
+        <canvas id="radarChart"></canvas>
+
+    </div>
+
+
+
+    <div class="card">
+
+        <div class="chart-title">
+
+            CPU vs Response Time
+
+        </div>
+
+        <div class="chart-description">
+
+            Backend performance relationship
+
+        </div>
+
+        <canvas id="scatterChart"></canvas>
+
+    </div>
+
+
+
+    <div class="card">
+
+        <div class="chart-title">
+
+            Overall System Load
+
+        </div>
+
+        <div class="chart-description">
+
+            Combined simulated load indicator
+
+        </div>
+
+
+        <div class="gauge-container">
+
+            <div
+                class="gauge"
+                id="gauge">
+
+                <div class="gauge-inner">
+
+                    <div
+                        class="gauge-value"
+                        id="gaugeValue">
+
+                        --
+
+                    </div>
+
+                    <div class="gauge-label">
+                        SYSTEM LOAD
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<!-- =======================================================
+     EVENTS
+======================================================= -->
+
+<div class="section-title">
+
+    Recent Controller Decisions
+
+</div>
+
+
+<div
+    class="card events"
+    id="events">
+
+</div>
+
+
+
+<div class="footer">
+
+    Demonstration only — all dashboard metrics are simulated.
+    They are not actual Ryu, Mininet, monitoring, or experiment results.
+
+</div>
+
+
+</main>
+
+
+
+<script>
+
+/* =========================================================
+   SERVER CONFIGURATION
+========================================================= */
+
+const servers = [
+
+    {
+        name: "h5",
+        ip: "10.0.0.5",
+        port: 8001,
+
+        cpu: 35,
+        response: 25,
+        connections: 7,
+        network: 4
+    },
+
+    {
+        name: "h6",
+        ip: "10.0.0.6",
+        port: 8002,
+
+        cpu: 46,
+        response: 32,
+        connections: 10,
+        network: 5
+    },
+
+    {
+        name: "h7",
+        ip: "10.0.0.7",
+        port: 8003,
+
+        cpu: 58,
+        response: 45,
+        connections: 15,
+        network: 7
+    },
+
+    {
+        name: "h8",
+        ip: "10.0.0.8",
+        port: 8004,
+
+        cpu: 28,
+        response: 18,
+        connections: 5,
+        network: 3
+    },
+
+    {
+        name: "h9",
+        ip: "10.0.0.9",
+        port: 8005,
+
+        cpu: 40,
+        response: 30,
+        connections: 9,
+        network: 4
+    },
+
+    {
+        name: "h10",
+        ip: "10.0.0.10",
+        port: 8006,
+
+        cpu: 52,
+        response: 42,
+        connections: 13,
+        network: 6
+    }
+
+];
+
+
+/* =========================================================
+   GLOBAL STATE
+========================================================= */
+
+let selectedIndex = 4;
+
+let processed = 1200;
+
+let totalRequests = 1500;
+
+let successfulRequests = 1435;
+
+let failedRequests = 65;
+
+let tick = 0;
+
+let running = true;
+
+let events = [];
+
+
+/* =========================================================
+   GRAPH HISTORY
+========================================================= */
+
+const history = {
+
+    cpu: [],
+
+    network: [],
+
+    response: [],
+
+    requests: []
+
+};
+
+
+/* =========================================================
+   UTILITY
+========================================================= */
+
+function clamp(
+    value,
+    minimum,
+    maximum
+) {
+
+    return Math.max(
+        minimum,
+        Math.min(
+            maximum,
+            value
+        )
+    );
+
+}
+
+
+function move(
+    value,
+    amount,
+    minimum,
+    maximum
+) {
+
+    const change =
+        (Math.random() - 0.5) *
+        amount;
+
+    return clamp(
+        value + change,
+        minimum,
+        maximum
+    );
+
+}
+
+
+/* =========================================================
+   SERVER METRICS
+========================================================= */
+
+function updateServers() {
+
+    servers.forEach(server => {
+
+        server.cpu =
+            move(
+                server.cpu,
+                12,
+                8,
+                92
+            );
+
+
+        server.response =
+            move(
+                server.response,
+                10,
+                8,
+                180
+            );
+
+
+        server.connections =
+            Math.round(
+                move(
+                    server.connections,
+                    5,
+                    0,
+                    35
+                )
+            );
+
+
+        server.network =
+            move(
+                server.network,
+                2,
+                0.5,
+                15
+            );
+
+    });
+
+}
+
+
+/* =========================================================
+   SELECT BACKEND
+========================================================= */
+
+function selectBackend() {
+
+    /*
+       The fake controller changes its
+       decision periodically.
+    */
+
+    if (
+        tick % 6 === 0 ||
+        Math.random() < 0.08
+    ) {
+
+        selectedIndex =
+            Math.floor(
+                Math.random() *
+                servers.length
+            );
+
+    }
+
+}
+
+
+/* =========================================================
+   SCORE
+========================================================= */
+
+function calculateScore(server) {
+
+    const cpu =
+        server.cpu / 100;
+
+    const connections =
+        server.connections / 35;
+
+    const response =
+        server.response / 180;
+
+    const network =
+        server.network / 15;
+
+
+    return (
+
+        cpu * 0.40 +
+
+        connections * 0.20 +
+
+        response * 0.25 +
+
+        network * 0.15
+
+    );
+
+}
+
+
+/* =========================================================
+   HEALTH
+========================================================= */
+
+function calculateHealth(server) {
+
+    const score =
+        calculateScore(server);
+
+
+    return clamp(
+        100 -
+        score * 100,
+        5,
+        100
+    );
+
+}
+
+
+/* =========================================================
+   HEALTH CLASS
+========================================================= */
+
+function healthClass(health) {
+
+    if (health >= 70)
+        return "health-good";
+
+    if (health >= 45)
+        return "health-medium";
+
+    return "health-high";
+
+}
+
+
+/* =========================================================
+   HEALTH TEXT
+========================================================= */
+
+function healthText(health) {
+
+    if (health >= 70)
+        return "HEALTHY";
+
+    if (health >= 45)
+        return "MODERATE";
+
+    return "HIGH LOAD";
+
+}
+
+
+/* =========================================================
+   RENDER BACKENDS
+========================================================= */
+
+function renderBackends() {
+
+    const container =
+        document.getElementById(
+            "backendContainer"
+        );
+
+
+    container.innerHTML = "";
+
+
+    servers.forEach(
+        (server, index) => {
+
+            const selected =
+                index === selectedIndex;
+
+
+            const health =
+                calculateHealth(server);
+
+
+            const card =
+                document.createElement(
+                    "div"
+                );
+
+
+            card.className =
+                "card backend-card " +
+                (
+                    selected
+                        ? "selected"
+                        : ""
+                );
+
+
+            card.innerHTML = `
+
+                ${
+                    selected
+                        ?
+                    `
+                    <div class="selected-tag">
+                        SELECTED
+                    </div>
+                    `
+                        :
+                    ""
+                }
+
+
+                <div class="server-name">
+
+                    ${server.name}
+
+                </div>
+
+
+                <div class="server-ip">
+
+                    ${server.ip}:${server.port}
+
+                </div>
+
+
+                <div
+                    class="
+                        health-badge
+                        ${healthClass(health)}
+                    ">
+
+                    ${healthText(health)}
+                    •
+                    ${health.toFixed(0)}%
+
+                </div>
+
+
+                <!-- CPU -->
+
+                <div class="metric">
+
+                    <div class="metric-line">
+
+                        <span>
+                            CPU Usage
+                        </span>
+
+                        <span class="metric-value">
+
+                            ${server.cpu.toFixed(1)}%
+
+                        </span>
+
+                    </div>
+
+
+                    <div class="progress">
+
+                        <div
+                            class="progress-fill"
+                            style="
+                                width:
+                                ${server.cpu}%
+                            ">
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- RESPONSE -->
+
+                <div class="metric">
+
+                    <div class="metric-line">
+
+                        <span>
+                            Response Time
+                        </span>
+
+                        <span class="metric-value">
+
+                            ${server.response.toFixed(1)}
+                            ms
+
+                        </span>
+
+                    </div>
+
+
+                    <div class="progress">
+
+                        <div
+                            class="progress-fill"
+                            style="
+                                width:
+                                ${Math.min(
+                                    server.response / 1.8,
+                                    100
+                                )}%
+                            ">
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- CONNECTIONS -->
+
+                <div class="metric">
+
+                    <div class="metric-line">
+
+                        <span>
+                            Active Connections
+                        </span>
+
+                        <span class="metric-value">
+
+                            ${server.connections}
+
+                        </span>
+
+                    </div>
+
+
+                    <div class="progress">
+
+                        <div
+                            class="progress-fill"
+                            style="
+                                width:
+                                ${
+                                    server.connections /
+                                    35 *
+                                    100
+                                }%
+                            ">
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- NETWORK -->
+
+                <div class="metric">
+
+                    <div class="metric-line">
+
+                        <span>
+                            Network Load
+                        </span>
+
+                        <span class="metric-value">
+
+                            ${server.network.toFixed(2)}
+                            MB/s
+
+                        </span>
+
+                    </div>
+
+
+                    <div class="progress">
+
+                        <div
+                            class="progress-fill"
+                            style="
+                                width:
+                                ${
+                                    server.network /
+                                    15 *
+                                    100
+                                }%
+                            ">
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- SCORE -->
+
+                <div class="metric">
+
+                    <div class="metric-line">
+
+                        <span>
+                            Intelligent Score
+                        </span>
+
+                        <span class="metric-value">
+
+                            ${calculateScore(server).toFixed(3)}
+
+                        </span>
+
+                    </div>
+
+                </div>
+
+            `;
+
+
+            container.appendChild(card);
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   SUMMARY
+========================================================= */
+
+function updateSummary() {
+
+    const selected =
+        servers[selectedIndex];
+
+
+    const score =
+        calculateScore(selected);
+
+
+    const avgResponse =
+        servers.reduce(
+            (sum, server) =>
+                sum + server.response,
+            0
+        ) / servers.length;
+
+
+    const totalNetwork =
+        servers.reduce(
+            (sum, server) =>
+                sum + server.network,
+            0
+        );
+
+
+    const avgCpu =
+        servers.reduce(
+            (sum, server) =>
+                sum + server.cpu,
+            0
+        ) / servers.length;
+
+
+    const rps =
+        Math.round(
+            35 +
+            Math.random() * 65
+        );
+
+
+    processed +=
+        Math.floor(
+            5 +
+            Math.random() * 15
+        );
+
+
+    totalRequests +=
+        Math.floor(
+            5 +
+            Math.random() * 15
+        );
+
+
+    successfulRequests +=
+        Math.floor(
+            4 +
+            Math.random() * 14
+        );
+
+
+    failedRequests +=
+        Math.random() < 0.15
+            ? 1
+            : 0;
+
+
+    const successRate =
+        successfulRequests /
+        (
+            successfulRequests +
+            failedRequests
+        ) *
+        100;
+
+
+    document.getElementById(
+        "rps"
+    ).textContent =
+        rps;
+
+
+    document.getElementById(
+        "selectedBackend"
+    ).textContent =
+        selected.name;
+
+
+    document.getElementById(
+        "selectedAddress"
+    ).textContent =
+        `${selected.ip}:${selected.port}`;
+
+
+    document.getElementById(
+        "selectedScore"
+    ).textContent =
+        score.toFixed(3);
+
+
+    document.getElementById(
+        "processed"
+    ).textContent =
+        processed.toLocaleString();
+
+
+    document.getElementById(
+        "avgResponse"
+    ).textContent =
+        avgResponse.toFixed(1) +
+        " ms";
+
+
+    document.getElementById(
+        "throughput"
+    ).textContent =
+        totalNetwork.toFixed(2) +
+        " MB/s";
+
+
+    document.getElementById(
+        "successRate"
+    ).textContent =
+        successRate.toFixed(1) +
+        "%";
+
+
+    document.getElementById(
+        "systemLoad"
+    ).textContent =
+        avgCpu.toFixed(1) +
+        "%";
+
+
+    updateGauge(avgCpu);
+
+}
+
+
+/* =========================================================
+   HISTORY
+========================================================= */
+
+function updateHistory() {
+
+    const avgCpu =
+        servers.reduce(
+            (sum, server) =>
+                sum + server.cpu,
+            0
+        ) / servers.length;
+
+
+    const network =
+        servers.reduce(
+            (sum, server) =>
+                sum + server.network,
+            0
+        );
+
+
+    const avgResponse =
+        servers.reduce(
+            (sum, server) =>
+                sum + server.response,
+            0
+        ) / servers.length;
+
+
+    const rps =
+        35 +
+        Math.random() * 65;
+
+
+    history.cpu.push(avgCpu);
+
+    history.network.push(network);
+
+    history.response.push(avgResponse);
+
+    history.requests.push(rps);
+
+
+    Object.values(history)
+        .forEach(array => {
+
+            if (array.length > 40) {
+
+                array.shift();
+
+            }
+
+        });
+
+}
+
+
+/* =========================================================
+   LINE CHART
+========================================================= */
+
+function drawLineChart(
+    canvasId,
+    data,
+    label
+) {
+
+    const canvas =
+        document.getElementById(
+            canvasId
+        );
+
+
+    const width =
+        canvas.clientWidth;
+
+
+    const height =
+        220;
+
+
+    const dpr =
+        window.devicePixelRatio || 1;
+
+
+    canvas.width =
+        width * dpr;
+
+
+    canvas.height =
+        height * dpr;
+
+
+    const ctx =
+        canvas.getContext("2d");
+
+
+    ctx.scale(
+        dpr,
+        dpr
+    );
+
+
+    ctx.clearRect(
+        0,
+        0,
+        width,
+        height
+    );
+
+
+    drawGrid(
+        ctx,
+        width,
+        height
+    );
+
+
+    if (data.length < 2)
+        return;
+
+
+    const min =
+        Math.min(...data);
+
+
+    const max =
+        Math.max(...data);
+
+
+    const range =
+        Math.max(
+            max - min,
+            1
+        );
+
+
+    ctx.beginPath();
+
+
+    data.forEach(
+        (value, index) => {
+
+            const x =
+                index /
+                (data.length - 1) *
+                width;
+
+
+            const y =
+                175 -
+                (
+                    (value - min) /
+                    range
+                ) *
+                135;
+
+
+            if (index === 0)
+
+                ctx.moveTo(
+                    x,
+                    y
+                );
+
+            else
+
+                ctx.lineTo(
+                    x,
+                    y
+                );
+
+        }
+    );
+
+
+    ctx.strokeStyle =
+        "#246bfe";
+
+
+    ctx.lineWidth = 2;
+
+
+    ctx.stroke();
+
+
+    ctx.fillStyle =
+        "#7c8797";
+
+
+    ctx.font =
+        "10px Arial";
+
+
+    ctx.fillText(
+        label +
+        ": " +
+        data[data.length - 1]
+            .toFixed(1),
+        8,
+        15
+    );
+
+}
+
+
+/* =========================================================
+   AREA CHART
+========================================================= */
+
+function drawAreaChart(
+    canvasId,
+    data
+) {
+
+    const canvas =
+        document.getElementById(
+            canvasId
+        );
+
+
+    const width =
+        canvas.clientWidth;
+
+
+    const height =
+        220;
+
+
+    const dpr =
+        window.devicePixelRatio || 1;
+
+
+    canvas.width =
+        width * dpr;
+
+
+    canvas.height =
+        height * dpr;
+
+
+    const ctx =
+        canvas.getContext("2d");
+
+
+    ctx.scale(
+        dpr,
+        dpr
+    );
+
+
+    ctx.clearRect(
+        0,
+        0,
+        width,
+        height
+    );
+
+
+    drawGrid(
+        ctx,
+        width,
+        height
+    );
+
+
+    if (data.length < 2)
+        return;
+
+
+    const max =
+        Math.max(
+            ...data,
+            1
+        );
+
+
+    ctx.beginPath();
+
+
+    data.forEach(
+        (value, index) => {
+
+            const x =
+                index /
+                (data.length - 1) *
+                width;
+
+
+            const y =
+                180 -
+                (
+                    value / max
+                ) *
+                145;
+
+
+            if (index === 0)
+
+                ctx.moveTo(
+                    x,
+                    y
+                );
+
+            else
+
+                ctx.lineTo(
+                    x,
+                    y
+                );
+
+        }
+    );
+
+
+    ctx.lineTo(
+        width,
+        180
+    );
+
+
+    ctx.lineTo(
+        0,
+        180
+    );
+
+
+    ctx.closePath();
+
+
+    ctx.fillStyle =
+        "#246bfe18";
+
+
+    ctx.fill();
+
+
+    ctx.beginPath();
+
+
+    data.forEach(
+        (value, index) => {
+
+            const x =
+                index /
+                (data.length - 1) *
+                width;
+
+
+            const y =
+                180 -
+                (
+                    value / max
+                ) *
+                145;
+
+
+            if (index === 0)
+
+                ctx.moveTo(
+                    x,
+                    y
+                );
+
+            else
+
+                ctx.lineTo(
+                    x,
+                    y
+                );
+
+        }
+    );
+
+
+    ctx.strokeStyle =
+        "#246bfe";
+
+
+    ctx.lineWidth = 2;
+
+
+    ctx.stroke();
+
+}
+
+
+/* =========================================================
+   GRID
+========================================================= */
+
+function drawGrid(
+    ctx,
+    width,
+    height
+) {
+
+    ctx.strokeStyle =
+        "#edf0f4";
+
+
+    ctx.lineWidth = 1;
+
+
+    for (
+        let y = 35;
+        y < height;
+        y += 35
+    ) {
+
+        ctx.beginPath();
+
+        ctx.moveTo(
+            0,
+            y
+        );
+
+        ctx.lineTo(
+            width,
+            y
+        );
+
+        ctx.stroke();
+
+    }
+
+}
+
+
+/* =========================================================
+   BAR CHART
+========================================================= */
+
+function drawBarChart() {
+
+    const canvas =
+        document.getElementById(
+            "cpuBarChart"
+        );
+
+
+    const width =
+        canvas.clientWidth;
+
+
+    const height =
+        220;
+
+
+    const dpr =
+        window.devicePixelRatio || 1;
+
+
+    canvas.width =
+        width * dpr;
+
+
+    canvas.height =
+        height * dpr;
+
+
+    const ctx =
+        canvas.getContext("2d");
+
+
+    ctx.scale(
+        dpr,
+        dpr
+    );
+
+
+    ctx.clearRect(
+        0,
+        0,
+        width,
+        height
+    );
+
+
+    drawGrid(
+        ctx,
+        width,
+        height
+    );
+
+
+    const gap =
+        width /
+        servers.length;
+
+
+    const barWidth =
+        gap * 0.52;
+
+
+    servers.forEach(
+        (server, index) => {
+
+            const x =
+                index * gap +
+                (
+                    gap -
+                    barWidth
+                ) / 2;
+
+
+            const barHeight =
+                server.cpu /
+                100 *
+                150;
+
+
+            const y =
+                180 -
+                barHeight;
+
+
+            ctx.fillStyle =
+                index === selectedIndex
+                    ? "#246bfe"
+                    : "#aeb8c8";
+
+
+            ctx.fillRect(
+                x,
+                y,
+                barWidth,
+                barHeight
+            );
+
+
+            ctx.fillStyle =
+                "#5f6b7e";
+
+
+            ctx.font =
+                "10px Arial";
+
+
+            ctx.textAlign =
+                "center";
+
+
+            ctx.fillText(
+                server.name,
+                x +
+                barWidth / 2,
+                198
+            );
+
+
+            ctx.fillText(
+                server.cpu.toFixed(0) +
+                "%",
+                x +
+                barWidth / 2,
+                y - 6
+            );
+
+        }
+    );
+
+
+    ctx.textAlign =
+        "left";
+
+}
+
+
+/* =========================================================
+   DOUGHNUT CHART
+========================================================= */
+
+function drawDoughnut() {
+
+    const canvas =
+        document.getElementById(
+            "distributionChart"
+        );
+
+
+    const width =
+        canvas.clientWidth;
+
+
+    const height =
+        220;
+
+
+    const dpr =
+        window.devicePixelRatio || 1;
+
+
+    canvas.width =
+        width * dpr;
+
+
+    canvas.height =
+        height * dpr;
+
+
+    const ctx =
+        canvas.getContext("2d");
+
+
+    ctx.scale(
+        dpr,
+        dpr
+    );
+
+
+    ctx.clearRect(
+        0,
+        0,
+        width,
+        height
+    );
+
+
+    const cx =
+        width / 2;
+
+
+    const cy =
+        105;
+
+
+    const radius =
+        72;
+
+
+    const inner =
+        42;
+
+
+    const weights =
+        servers.map(
+            server =>
+                1 /
+                (
+                    calculateScore(server) +
+                    0.12
+                )
+        );
+
+
+    const total =
+        weights.reduce(
+            (a,b) =>
+                a + b,
+            0
+        );
+
+
+    let start =
+        -Math.PI / 2;
+
+
+    servers.forEach(
+        (server,index) => {
+
+            const angle =
+                weights[index] /
+                total *
+                Math.PI *
+                2;
+
+
+            ctx.beginPath();
+
+
+            ctx.moveTo(
+                cx,
+                cy
+            );
+
+
+            ctx.arc(
+                cx,
+                cy,
+                radius,
+                start,
+                start + angle
+            );
+
+
+            ctx.closePath();
+
+
+            ctx.fillStyle =
+                index === selectedIndex
+                    ? "#246bfe"
+                    : "#b8c2d0";
+
+
+            ctx.fill();
+
+
+            start += angle;
+
+        }
+    );
+
+
+    ctx.beginPath();
+
+
+    ctx.arc(
+        cx,
+        cy,
+        inner,
+        0,
+        Math.PI * 2
+    );
+
+
+    ctx.fillStyle =
+        "#ffffff";
+
+
+    ctx.fill();
+
+
+    ctx.fillStyle =
+        "#263249";
+
+
+    ctx.font =
+        "bold 16px Arial";
+
+
+    ctx.textAlign =
+        "center";
+
+
+    ctx.fillText(
+        "LOAD",
+        cx,
+        cy - 2
+    );
+
+
+    ctx.font =
+        "10px Arial";
+
+
+    ctx.fillStyle =
+        "#8a94a4";
+
+
+    ctx.fillText(
+        "distribution",
+        cx,
+        cy + 14
+    );
+
+
+    ctx.textAlign =
+        "left";
+
+}
+
+
+/* =========================================================
+   RADAR CHART
+========================================================= */
+
+function drawRadar() {
+
+    const canvas =
+        document.getElementById(
+            "radarChart"
+        );
+
+
+    const width =
+        canvas.clientWidth;
+
+
+    const height =
+        220;
+
+
+    const dpr =
+        window.devicePixelRatio || 1;
+
+
+    canvas.width =
+        width * dpr;
+
+
+    canvas.height =
+        height * dpr;
+
+
+    const ctx =
+        canvas.getContext("2d");
+
+
+    ctx.scale(
+        dpr,
+        dpr
+    );
+
+
+    ctx.clearRect(
+        0,
+        0,
+        width,
+        height
+    );
+
+
+    const cx =
+        width / 2;
+
+
+    const cy =
+        105;
+
+
+    const radius =
+        Math.min(
+            width,
+            height
+        ) * .32;
+
+
+    const metrics = [
+
+        "CPU",
+
+        "Response",
+
+        "Connections",
+
+        "Network",
+
+        "Health"
+
+    ];
+
+
+    const values =
+        servers[selectedIndex];
+
+
+    const data = [
+
+        100 - values.cpu,
+
+        100 -
+        values.response /
+        180 *
+        100,
+
+        100 -
+        values.connections /
+        35 *
+        100,
+
+        100 -
+        values.network /
+        15 *
+        100,
+
+        calculateHealth(values)
+
+    ];
+
+
+    const count =
+        metrics.length;
+
+
+    for (
+        let level = 1;
+        level <= 4;
+        level++
+    ) {
+
+        ctx.beginPath();
+
+
+        for (
+            let i = 0;
+            i < count;
+            i++
+        ) {
+
+            const angle =
+                -Math.PI / 2 +
+                i /
+                count *
+                Math.PI *
+                2;
+
+
+            const r =
+                radius *
+                level /
+                4;
+
+
+            const x =
+                cx +
+                Math.cos(angle) *
+                r;
+
+
+            const y =
+                cy +
+                Math.sin(angle) *
+                r;
+
+
+            if (i === 0)
+
+                ctx.moveTo(
+                    x,
+                    y
+                );
+
+            else
+
+                ctx.lineTo(
+                    x,
+                    y
+                );
+
+        }
+
+
+        ctx.closePath();
+
+
+        ctx.strokeStyle =
+            "#e3e7ed";
+
+
+        ctx.stroke();
+
+    }
+
+
+    ctx.beginPath();
+
+
+    data.forEach(
+        (value,index) => {
+
+            const angle =
+                -Math.PI / 2 +
+                index /
+                count *
+                Math.PI *
+                2;
+
+
+            const r =
+                radius *
+                value /
+                100;
+
+
+            const x =
+                cx +
+                Math.cos(angle) *
+                r;
+
+
+            const y =
+                cy +
+                Math.sin(angle) *
+                r;
+
+
+            if (index === 0)
+
+                ctx.moveTo(
+                    x,
+                    y
+                );
+
+            else
+
+                ctx.lineTo(
+                    x,
+                    y
+                );
+
+        }
+    );
+
+
+    ctx.closePath();
+
+
+    ctx.fillStyle =
+        "#246bfe18";
+
+
+    ctx.fill();
+
+
+    ctx.strokeStyle =
+        "#246bfe";
+
+
+    ctx.lineWidth = 2;
+
+
+    ctx.stroke();
+
+
+    ctx.fillStyle =
+        "#697487";
+
+
+    ctx.font =
+        "10px Arial";
+
+
+    metrics.forEach(
+        (metric,index) => {
+
+            const angle =
+                -Math.PI / 2 +
+                index /
+                count *
+                Math.PI *
+                2;
+
+
+            const x =
+                cx +
+                Math.cos(angle) *
+                (radius + 18);
+
+
+            const y =
+                cy +
+                Math.sin(angle) *
+                (radius + 18);
+
+
+            ctx.textAlign =
+                "center";
+
+
+            ctx.fillText(
+                metric,
+                x,
+                y
+            );
+
+        }
+    );
+
+
+    ctx.textAlign =
+        "left";
+
+}
+
+
+/* =========================================================
+   SCATTER CHART
+========================================================= */
+
+function drawScatter() {
+
+    const canvas =
+        document.getElementById(
+            "scatterChart"
+        );
+
+
+    const width =
+        canvas.clientWidth;
+
+
+    const height =
+        220;
+
+
+    const dpr =
+        window.devicePixelRatio || 1;
+
+
+    canvas.width =
+        width * dpr;
+
+
+    canvas.height =
+        height * dpr;
+
+
+    const ctx =
+        canvas.getContext("2d");
+
+
+    ctx.scale(
+        dpr,
+        dpr
+    );
+
+
+    ctx.clearRect(
+        0,
+        0,
+        width,
+        height
+    );
+
+
+    drawGrid(
+        ctx,
+        width,
+        height
+    );
+
+
+    servers.forEach(
+        (server,index) => {
+
+            const x =
+                server.cpu /
+                100 *
+                (
+                    width - 35
+                ) +
+                20;
+
+
+            const y =
+                185 -
+                server.response /
+                180 *
+                150;
+
+
+            ctx.beginPath();
+
+
+            ctx.arc(
+                x,
+                y,
+                index === selectedIndex
+                    ? 7
+                    : 5,
+                0,
+                Math.PI * 2
+            );
+
+
+            ctx.fillStyle =
+                index === selectedIndex
+                    ? "#246bfe"
+                    : "#8d99aa";
+
+
+            ctx.fill();
+
+
+            ctx.fillStyle =
+                "#687386";
+
+
+            ctx.font =
+                "10px Arial";
+
+
+            ctx.fillText(
+                server.name,
+                x + 7,
+                y - 7
+            );
+
+        }
+    );
+
+
+    ctx.fillStyle =
+        "#7d8796";
+
+
+    ctx.font =
+        "10px Arial";
+
+
+    ctx.fillText(
+        "CPU %",
+        width - 40,
+        210
+    );
+
+
+    ctx.save();
+
+
+    ctx.translate(
+        10,
+        120
+    );
+
+
+    ctx.rotate(
+        -Math.PI / 2
+    );
+
+
+    ctx.fillText(
+        "Response ms",
+        0,
+        0
+    );
+
+
+    ctx.restore();
+
+}
+
+
+/* =========================================================
+   GAUGE
+========================================================= */
+
+function updateGauge(load) {
+
+    const angle =
+        clamp(
+            load,
+            0,
+            100
+        ) *
+        3.6;
+
+
+    document.getElementById(
+        "gauge"
+    ).style
+        .setProperty(
+            "--gauge-angle",
+            angle + "deg"
+        );
+
+
+    document.getElementById(
+        "gaugeValue"
+    ).textContent =
+        load.toFixed(0) +
+        "%";
+
+}
+
+
+/* =========================================================
+   EVENTS
+========================================================= */
+
+function addEvent() {
+
+    const server =
+        servers[selectedIndex];
+
+
+    const score =
+        calculateScore(server);
+
+
+    events.unshift({
+
+        text:
+            "Intelligent selector → " +
+            server.name +
+            " (" +
+            server.ip +
+            ":" +
+            server.port +
+            ")",
+
+        score:
+            score.toFixed(3),
+
+        time:
+            new Date()
+                .toLocaleTimeString()
+
+    });
+
+
+    events =
+        events.slice(
+            0,
+            6
+        );
+
+
+    document.getElementById(
+        "events"
+    ).innerHTML =
+
+        events.map(
+            event => `
+
+                <div class="event">
+
+                    <span class="event-main">
+
+                        ${event.text}
+
+                        • score
+                        ${event.score}
+
+                    </span>
+
+                    <span class="event-time">
+
+                        ${event.time}
+
+                    </span>
+
+                </div>
+
+            `
+        ).join("");
+
+}
+
+
+/* =========================================================
+   DRAW ALL CHARTS
+========================================================= */
+
+function drawAllCharts() {
+
+    drawLineChart(
+        "cpuLineChart",
+        history.cpu,
+        "Average CPU"
+    );
+
+
+    drawAreaChart(
+        "networkAreaChart",
+        history.network
+    );
+
+
+    drawBarChart();
+
+
+    drawDoughnut();
+
+
+    drawRadar();
+
+
+    drawScatter();
+
+}
+
+
+/* =========================================================
+   MAIN UPDATE
+========================================================= */
+
+function updateDashboard() {
+
+    if (!running)
+        return;
+
+
+    tick++;
+
+
+    updateServers();
+
+
+    selectBackend();
+
+
+    updateSummary();
+
+
+    updateHistory();
+
+
+    renderBackends();
+
+
+    drawAllCharts();
+
+
+    /*
+       Add controller event
+       every few cycles.
+    */
+
+    if (
+        tick === 1 ||
+        tick % 4 === 0
+    ) {
+
+        addEvent();
+
+    }
+
+}
+
+
+/* =========================================================
+   CLOCK
+========================================================= */
+
+function updateClock() {
+
+    document.getElementById(
+        "clock"
+    ).textContent =
+        new Date()
+            .toLocaleTimeString();
+
+}
+
+
+/* =========================================================
+   PAUSE / RESUME
+========================================================= */
+
+function toggleSimulation() {
+
+    running =
+        !running;
+
+
+    const button =
+        document.getElementById(
+            "pauseButton"
+        );
+
+
+    button.textContent =
+        running
+            ? "Pause"
+            : "Resume";
+
+}
+
+
+/* =========================================================
+   RESET
+========================================================= */
+
+function resetSimulation() {
+
+    location.reload();
+
+}
+
+
+/* =========================================================
+   WINDOW RESIZE
+========================================================= */
+
+window.addEventListener(
+    "resize",
+    () => {
+
+        drawAllCharts();
+
+    }
+);
+
+
+/* =========================================================
+   START
+========================================================= */
+
+renderBackends();
+
+updateDashboard();
+
+updateClock();
+
+
+/*
+   Dashboard updates every 1.5 seconds.
+*/
+
+setInterval(
+    updateDashboard,
+    1500
+);
+
+
+/*
+   Clock updates every second.
+*/
+
+setInterval(
+    updateClock,
+    1000
+);
+
+</script>
+
+</body>
+
+</html>
+```
